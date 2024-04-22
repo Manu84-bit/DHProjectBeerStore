@@ -69,7 +69,7 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
-      - "8080:8080"
+      - "8282:8080"
     volumes:
       - ./realms/:/opt/keycloak/data/import/
     depends_on:
@@ -77,7 +77,7 @@ services:
 
   ## Eureka Server
   discovery-server:
-    image: microservices-beer/discovery-server:latest
+    image: manuamado/discovery-server:latest
     container_name: discovery-server
     ports:
       - "8761:8761"
@@ -85,12 +85,12 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
 
   api-gateway:
-    image: microservices-beer/api-gateway:latest
+    image: manuamado/api-gateway:latest
     container_name: api-gateway
     ports:
-      - "8181:8080"
+      - "8080:8080"
     expose:
-      - "8181"
+      - "8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -100,7 +100,7 @@ services:
   ## Product-Service Docker Compose Config
   product-service:
     container_name: product-service
-    image: microservices-beer/product-service:latest
+    image: manuamado/product-service:latest
     pull_policy: always
     environment:
       - SPRING_PROFILES_ACTIVE=docker
@@ -112,7 +112,9 @@ services:
   ## Order-Service Docker Compose Config
   order-service:
     container_name: order-service
-    image: microservices-beer/order-service:latest
+    ports:
+      - "50206:50206"
+    image: manuamado/order-service:latest
     pull_policy: always
     environment:
       - SPRING_PROFILES_ACTIVE=docker
@@ -125,7 +127,7 @@ services:
   ## Inventory-Service Docker Compose Config
   inventory-service:
     container_name: inventory-service
-    image: microservices-beer/inventory-service:latest
+    image: manuamado/inventory-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-inventory:5432/inventory-service
