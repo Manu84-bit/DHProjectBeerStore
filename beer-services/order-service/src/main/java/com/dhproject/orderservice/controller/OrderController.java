@@ -42,4 +42,11 @@ public class OrderController {
         return orderService.findOrdersByUserId(userId);
     }
 
+    @DeleteMapping("/del/{orderId}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteById(@PathVariable Long orderId){
+        orderService.deleteOrderByOrderLineID(orderId);
+        return "Order deleted successfully";
+    }
+
 }

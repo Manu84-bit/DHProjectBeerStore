@@ -44,8 +44,8 @@ public class OrderService {
                     .bodyToMono(Integer.class)
                     .block();
             if(result < orderLineItems.getQuantity()){
-                throw new IllegalArgumentException("Product with SKU code "
-                        + orderLineItems.getStockCode() + " is not in stock.");
+                throw new IllegalArgumentException("Producto con SKU code "
+                        + orderLineItems.getStockCode() + " no tiene suficientes unidades.");
             }
         }
 
@@ -71,6 +71,17 @@ public class OrderService {
         ).map(this::mapToOrderDTO).toList();
     }
 
+    public void deleteOrderByOrderLineID(Long orderId){
+        Optional<Order> order = orderRepository.findAll().stream().filter(
+                o -> o.getOrderLineItems().get(0).getOrderLineId().equals(orderId))
+                .findFirst();
+        if(order.isPresent()){
+            orderRepository.delete(order.get());
+        } else {
+            throw new IllegalArgumentException("Orden no encontrada");
+        }
+
+    }
     private OrderDTOReq mapToOrderDTO(Order order) {
         OrderDTOReq orderDTOReq = new OrderDTOReq();
         orderDTOReq.setUserId(order.getUserId());
