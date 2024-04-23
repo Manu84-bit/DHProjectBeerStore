@@ -36,3 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+inventory-service/src/main/resources/env.properties
+order-service/src/main/resources/env.properties
+product-service/src/main/resources/env.properties
