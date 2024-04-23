@@ -8,18 +8,19 @@ const Order = () => {
   const { keycloak } = useKeycloak();
   const token = keycloak.token;
   const userId =keycloak.tokenParsed.sub
-  const baseUrl = 'http://localhost:50206/api/order/user'
+  const baseUrl = 'http://localhost:50206/api/order'
   const [orders, setOrders] = useState([])
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [orderLine, setOrderLine] = useState(0);
 
   const fetchOrders = async () => {
     setLoading(true); // Start loading before fetching
     setError(null);   // Reset any previous error
   
     try {
-      const response = await fetch(`${baseUrl}/${userId}`, {
+      const response = await fetch(`${baseUrl}/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           // "Access-Control-Allow-Origin": "*",
@@ -31,6 +32,29 @@ const Order = () => {
       const data = await response.json();
       setOrders([...data]);
      
+    } catch (err) {
+      setError(err.message); // Capture the error message
+      console.log(error)
+    } finally {
+      setLoading(false); // End loading after fetch attempt
+    }
+  };
+
+
+  const deleteOrder = async (e) => {
+    e.preventDefault()
+    setOrderLine(e.target.name)
+    try {
+      const response = await fetch(`${baseUrl}/del/${orderLine}`, { method:'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // "Access-Control-Allow-Origin": "*",
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete order');
+      }
+       fetchOrders()
     } catch (err) {
       setError(err.message); // Capture the error message
       console.log(error)
@@ -55,7 +79,7 @@ const Order = () => {
  console.log(orders)
  return (
    <div>
-     <h1 className="text-center my-4">Aquí encontrarás el listado de tus órdenes</h1>
+     <h1 className="text-center my-4 mx-5">Aquí encontrarás el listado de tus órdenes</h1>
       <div className='my-3 mx-3'>
         {loading ? (
           <p>Loading orders...</p>
@@ -67,6 +91,7 @@ const Order = () => {
               <p>Producto: {order.orderLineItemsDTOList[0].stockCode}</p>
               <p>Cantidad: {order.orderLineItemsDTOList[0].quantity}</p>
               <p>Precio: $ {order.orderLineItemsDTOList[0].price}</p>
+              <button name={order.orderLineItemsDTOList[0].orderLineId} className="btn btn-danger w-75 py-1 mb-2" onClick={(e)=>deleteOrder(e)}>Eliminar orden</button>
             </div>
          
             </div>
